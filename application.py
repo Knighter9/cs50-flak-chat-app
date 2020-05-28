@@ -65,12 +65,17 @@ def messages():
 
 @socketio.on("user message")
 def vote(data):
+    print("what is up with you bots")
     username = data['username']
     message = data['user_message']
+    print(username)
+    print(message)
     channel_name = data['channel_name']
+    print(channel_name)
     channel_chats[channel_name].append({'message':message,'username':username})
     print('the user message event has been fired and is running')
-    emit('announce message',{'message':message,'username':username,'channel_name':channel_name}, room =channel_name)
+
+    emit('announce message', {'message':message,'username':username,'channel_name':channel_name}, room=channel_name) #room =channel_name)
 
 @socketio.on("join")
 def on_join(data):
@@ -79,6 +84,10 @@ def on_join(data):
     room = channel_name
     print(f'The join function has been fired and the user {username} will be join the {room} room ')
     join_room(room)
+
+@socketio.on('test')
+def on_test():
+    emit('pizza', {'fun_message': 'hello i really like pizza'})
 
 @socketio.on('leave')
 def on_leave(data):
@@ -89,6 +98,9 @@ def on_leave(data):
     room = channel_name
     print(f'The leave function has been fired and the user {username} has been removed from the {room} room')
     leave_room(room)
+
+
+
 
 
 
