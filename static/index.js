@@ -21,8 +21,10 @@ document.addEventListener("DOMContentLoaded",() => {
                 if(data.success){
                     let username = data.username;
                     localStorage.setItem('username',username);
+                    //history.pushState({'title':'user','text':request.responseText},'user','user')
                     welcome();
                     create_channel();
+
 
                 }
                 else{
@@ -48,7 +50,6 @@ document.addEventListener("DOMContentLoaded",() => {
     }
 
 });
-
 
 function welcome() {
     // create an ajax call to the channels page
@@ -102,14 +103,14 @@ function create_channel(){
                     let channel = data.channel;
                     // create a button
                     let new_button = document.createElement("button");
-                    // create and li
-                    let new_li = document.createElement('li');
-                    new_li.append(channel);
+                     new_button.append(channel);
                     // append the li into the button
                     new_button.setAttribute("class", "list_button");
-                    new_button.append(new_li);
+                    // create and li
+                    let new_li = document.createElement('li');
+                    new_li.append(new_button);
                     // access the unordered list and insert the new li
-                    document.querySelector("#listed_channels").append(new_button);
+                    document.querySelector("#listed_channels").append(new_li);
 
                    // reset the input field to have no text in it
                     document.querySelector('#channel_name').value = '';
@@ -119,6 +120,8 @@ function create_channel(){
 
                 } else {
                     console.log("the name is not available");
+                    // reset the input field to have no text in it
+                    document.querySelector('#channel_name').value = '';
                 }
 
             };
@@ -138,9 +141,304 @@ function button_listener(){
         var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
         socket.on('connect',()=>{
             console.log("the websocket is connected");
-            localStorage.setItem('counter',0);
-            localStorage.setItem('channel_name','standard');
-            socket.emit('join',{'username':localStorage.getItem('username'),'channel_name':'standard'})
+            if(localStorage.getItem('channel_name') !== 'standard' && localStorage.getItem('channel_name')) {
+                // message(socket,null,localStorage.getItem('channel_name'));
+                  var event = new Event("already_on_channel");
+                  document.dispatchEvent(event);
+            }
+            else {
+                localStorage.setItem('counter', 0);
+                localStorage.setItem('channel_name', 'standard');
+                socket.emit('join', {'username': localStorage.getItem('username'), 'channel_name': 'standard'})
+            }
+        });
+        document.addEventListener('already_on_channel',() =>{
+            tester_message(socket);
+        });
+        document.addEventListener('new_button_event',() =>{
+            document.querySelectorAll('.list_button').forEach(function(button){
+            button.onclick = () =>{
+                message(socket,button);
+                };
+            });
+        });
+        document.querySelectorAll('.list_button').forEach(function(button){
+            button.onclick = () => {
+                message(socket,button);
+
+
+            }
+        });
+
+        socket.on('announce message',data =>{
+        console.log('The announce message event has been fired');
+    //  if(document.querySelector('#welcome_chat').innerText === data.channel_name) {
+        const p = document.createElement('p');
+        p.innerHTML = `${data.message}\tFrom:${data.username}`;
+        p.setAttribute('class', 'user_displayed_message');
+        document.querySelector(".holy-grail-content").append(p);
+    //}
+    });
+    }
+
+}
+
+function tester_message(socket){
+    let channel_name = localStorage.getItem('channel_name');
+    socket.emit('join',{'channel_name':channel_name,'username':localStorage.getItem('username')});
+    if(document.querySelector('.user_displayed_message')){
+        document.querySelectorAll('.user_displayed_message').forEach(function (msg) {
+            msg.remove();
+        });
+
+    }
+    let p = document.querySelector("#welcome_chat");
+    p.innerText =  `${channel_name}`;
+    // make the message form visible
+    document.querySelectorAll('.message').forEach(input =>{
+        input.style.visibility = 'visible';
+    // create the web socket
+    });
+
+     let request = new XMLHttpRequest();
+    request.open('POST','/messages');
+
+    request.onload = () =>{
+        let data = JSON.parse(request.responseText);
+        console.log(data);
+        if (data.success) {
+            let messages = data.messages;
+            console.log(messages);
+            let length = messages.length;
+            for (let i = 0; i < length; i++) {
+                let p = document.createElement('p');
+                console.log(`${messages[i].message} from ${messages[i].username}`);
+                p.innerHTML = `${messages[i].message}\tFrom: ${messages[i].username}`;
+                p.setAttribute('class', 'user_displayed_message');
+                document.querySelector(".holy-grail-content").append(p);
+            }
+        }
+    };
+    let submit_data = new FormData();
+    submit_data.append('channel_name', channel_name);
+    request.send(submit_data);
+
+
+     document.querySelector("#message_submit").onclick = () =>{
+        // get the message
+        let user_message = document.querySelector("#user_message").value;
+        // remove the text from the input field
+        document.querySelector('#user_message').value = '';
+        socket.emit('user message',{'user_message':user_message,'username':localStorage.getItem('username'),'channel_name':channel_name})
+
+    };
+
+}
+
+function message(socket,button = null,pre_channel = null) {
+    var channel_name = '';
+    if (pre_channel == null){
+        var old_channel_name = localStorage.getItem('channel_name');
+        socket.emit('leave',{'channel_name':old_channel_name,'username':localStorage.getItem('username')});
+        channel_name = button.innerText;
+        localStorage.setItem('channel_name',channel_name);
+        socket.emit('join',{'channel_name':channel_name,'username':localStorage.getItem('username')});
+
+    }
+    else if(pre_channel !== null){
+        //channel_name = //localStorage.getItem('channel_name');
+        channel_name = pre_channel;
+        console.log(channel_name);
+        console.log('the channel_name has already been here')
+    }
+
+
+    // update the main page to welcome the user to the chat
+    let p = document.querySelector("#welcome_chat");
+    p.innerText =  `${channel_name}`;
+    // make the message form visible
+    document.querySelectorAll('.message').forEach(input =>{
+        input.style.visibility = 'visible';
+    // create the web socket
+    });
+    if(document.querySelector('.user_displayed_message')){
+        document.querySelectorAll('.user_displayed_message').forEach(function (msg) {
+            msg.remove();
+        });
+
+    }
+    // make the ajax requests for the messages
+    let request = new XMLHttpRequest();
+    request.open('POST','/messages');
+
+    request.onload = () =>{
+        let data = JSON.parse(request.responseText);
+        console.log(data);
+        if (data.success) {
+            let messages = data.messages;
+            console.log(messages);
+            let length = messages.length;
+            for (let i = 0; i < length; i++) {
+                let p = document.createElement('p');
+                console.log(`${messages[i].message} from ${messages[i].username}`);
+                p.innerHTML = `${messages[i].message}\tFrom: ${messages[i].username}`;
+                p.setAttribute('class', 'user_displayed_message');
+                document.querySelector(".holy-grail-content").append(p);
+            }
+        }
+    };
+    let submit_data = new FormData();
+    submit_data.append('channel_name', channel_name);
+    request.send(submit_data);
+
+    // when the message submit button is clicked run this code
+    document.querySelector("#message_submit").onclick = () =>{
+        // get the message
+        let user_message = document.querySelector("#user_message").value;
+        // remove the text from the input field
+        document.querySelector('#user_message').value = '';
+        console.log('the user message is being submitted');
+        socket.emit('user message',{'user_message':user_message,'username':localStorage.getItem('username'),'channel_name':channel_name})
+
+    };
+
+
+}
+/*
+window.onpopstate = e =>{
+    const data = e.state;
+    document.title = data.title;
+    document.querySelector('body').innerHTML = data.text;
+};
+*/
+
+/*
+function message(button,socket, pre_channel = null) {
+    if (pre_channel == null){
+
+    }
+    let old_channel_name = localStorage.getItem('channel_name');
+    let channel_name = button.innerText;
+    localStorage.setItem('channel_name',channel_name);
+    socket.emit('leave',{'channel_name':old_channel_name,'username':localStorage.getItem('username')});
+
+    // update the main page to welcome the user to the chat
+    let p = document.querySelector("#welcome_chat");
+    p.innerText =  `${channel_name}`;
+    // make the message form visible
+    document.querySelectorAll('.message').forEach(input =>{
+        input.style.visibility = 'visible';
+    // create the web socket
+    });
+    if(document.querySelector('.user_displayed_message')){
+        document.querySelectorAll('.user_displayed_message').forEach(function (msg) {
+            msg.remove();
+        });
+
+    }
+    // make the ajax requests for the messages
+    let request = new XMLHttpRequest();
+    request.open('POST','/messages');
+
+    request.onload = () =>{
+        let data = JSON.parse(request.responseText);
+        console.log(data);
+        if (data.success) {
+            let messages = data.messages;
+            console.log(messages);
+            let length = messages.length;
+            for (let i = 0; i < length; i++) {
+                let p = document.createElement('p');
+                console.log(`${messages[i].message} from ${messages[i].username}`);
+                p.innerHTML = `${messages[i].message}\tFrom: ${messages[i].username}`;
+                p.setAttribute('class', 'user_displayed_message');
+                document.querySelector(".holy-grail-content").append(p);
+            }
+        }
+    };
+    let submit_data = new FormData();
+    submit_data.append('channel_name', channel_name);
+    request.send(submit_data);
+
+    // join the room
+    socket.emit('join',{'channel_name':channel_name,'username':localStorage.getItem('username')});
+    // when the message submit button is clicked run this code
+    document.querySelector("#message_submit").onclick = () =>{
+        // get the message
+        let user_message = document.querySelector("#user_message").value;
+        // remove the text from the input field
+        document.querySelector('#user_message').value = '';
+        socket.emit('user message',{'user_message':user_message,'username':localStorage.getItem('username'),'channel_name':channel_name})
+
+    };
+
+
+}
+ */
+
+/*
+function button_listener(){
+    if(localStorage.getItem('username')){
+        var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+        socket.on('connect',()=>{
+            console.log("the websocket is connected");
+            if(localStorage.getItem('channel_name') !== 'standard' && localStorage.getItem('channel_name')){
+                // connect the user to the channel
+                let channel_name = localStorage.getItem('channel_name');
+                                // update the main page to welcome the user to the chat
+                let p = document.querySelector("#welcome_chat");
+                p.innerText =  `${channel_name}`;
+                // make the message form visible
+                document.querySelectorAll('.message').forEach(input =>{
+                    input.style.visibility = 'visible';
+                // create the web socket
+                });
+                if(document.querySelector('.user_displayed_message')){
+                    document.querySelectorAll('.user_displayed_message').forEach(function (msg) {
+                        msg.remove();
+                    });
+
+                }
+                let request = new XMLHttpRequest();
+                request.open('POST','/messages');
+
+                request.onload = () =>{
+                    let data = JSON.parse(request.responseText);
+                    console.log(data);
+                    if (data.success) {
+                        let messages = data.messages;
+                        console.log(messages);
+                        let length = messages.length;
+                        for (let i = 0; i < length; i++) {
+                            let p = document.createElement('p');
+                            console.log(`${messages[i].message} from ${messages[i].username}`);
+                            p.innerHTML = `${messages[i].message} from ${messages[i].username}`;
+                            p.setAttribute('class', 'user_displayed_message');
+                            document.querySelector(".holy-grail-content").append(p);
+                        }
+                    }
+                };
+                let submit_data = new FormData();
+                submit_data.append('channel_name', channel_name);
+                request.send(submit_data);
+
+                document.querySelector("#message_submit").onclick = () =>{
+                    // get the message
+                    let user_message = document.querySelector("#user_message").value;
+                    console.log(`The user message was ${user_message}`);
+                    // clear the input
+                    document.querySelector('#user_message').value = '';
+                    socket.emit('user message',{'user_message':user_message,'username':localStorage.getItem('username'),'channel_name':channel_name})
+
+                };
+
+
+            }
+            else {
+                localStorage.setItem('counter', 0);
+                localStorage.setItem('channel_name', 'standard');
+                socket.emit('join', {'username': localStorage.getItem('username'), 'channel_name': 'standard'})
+            }
     });
         document.addEventListener('new_button_event',() =>{
             document.querySelectorAll('.list_button').forEach(function(button){
@@ -265,12 +563,15 @@ function button_listener(){
             };
         });
         socket.on('announce message',data =>{
-        if(document.querySelector('#welcome_chat').innerText === data.channel_name) {
+            console.log('The announce message event has been fired');
+        //if(document.querySelector('#welcome_chat').innerText === data.channel_name) {
             const p = document.createElement('p');
             p.innerHTML = `${data.message}\tFrom:${data.username}`;
             p.setAttribute('class', 'user_displayed_message');
             document.querySelector(".holy-grail-content").append(p);
-        }
+        //}
     });
     }
+
 }
+ */
