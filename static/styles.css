@@ -1,0 +1,74 @@
+.form{
+    margin: 20px;
+    padding: 20px;
+    display: flex;
+
+
+
+}
+
+#form {
+    margin: 20px;
+
+}
+#header{
+
+    display: flex;
+    justify-content: center;
+}
+
+input{
+    padding: 2px;
+    margin: 2px;
+}
+
+
+.holy-grail {
+    min-height: 100vh;
+}
+
+.holy-grail,.holy-grail-body{
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    padding:5px;
+    margin: 5px;
+
+}
+
+.holy-grail-content {
+    flex: 1 1 auto;
+    background:rgba(0,0,0,0.3);
+    padding: 5px;
+    margin: 5px;
+
+}
+
+.holy-grail-sidebar-1 {
+    order: -1;
+}
+.hg-sidebar{
+    padding: 2px;
+    margin: 30px;
+}
+
+@media (min-width: 786px){
+    .holy-grail-body{
+        flex-direction: row;
+    }
+
+    .hg-sidebar{
+        flex:0 0 260px;
+
+
+    }
+}
+.message{
+    visibility: hidden;
+
+}
+/*
+.submit_message{
+    visibility: hidden;
+}
+8?
