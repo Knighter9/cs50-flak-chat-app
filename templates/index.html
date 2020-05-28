@@ -30,10 +30,11 @@
 
                 {% raw -%}
                 <div id = "channel_container" class="holy-grail-sidebar-1 hg-sidebar">
-                    <h2>available channels</h2>
+                    <h2 id = "available_channels">available channels</h2>
                     <ul id = "listed_channels">
                         {{#each channel_list}}
-                            <button class="list_button"><li>{{this}}</li></button>
+
+                        <li><button class="list_button">{{this}}</button></li>
                         {{/each}}
                     </ul>
                 </div>
