@@ -171,12 +171,19 @@ function button_listener(){
         });
 
         socket.on('announce message',data =>{
-        console.log('The announce message event has been fired');
-    //  if(document.querySelector('#welcome_chat').innerText === data.channel_name) {
-        const p = document.createElement('p');
-        p.innerHTML = `${data.message}\tFrom:${data.username}`;
-        p.setAttribute('class', 'user_displayed_message');
-        document.querySelector(".holy-grail-content").append(p);
+            console.log('The announce message event has been fired');
+        //  if(document.querySelector('#welcome_chat').innerText === data.channel_name) {
+            const p = document.createElement('p');
+            p.innerHTML = `${data.message}\tFrom:${data.username}`;
+            p.setAttribute('class', 'user_displayed_message');
+            p.setAttribute('id',document.querySelector('username'));
+            let username = localStorage.getItem('username');
+            if(data.username === username){
+                document.querySelector('#user_side_messages').append(p);
+            }
+            else {
+                document.querySelector('#foreign_side').append(p);
+            }
     //}
     });
     }
@@ -210,12 +217,19 @@ function tester_message(socket){
             let messages = data.messages;
             console.log(messages);
             let length = messages.length;
+            let username = localStorage.getItem('username');
             for (let i = 0; i < length; i++) {
                 let p = document.createElement('p');
                 console.log(`${messages[i].message} from ${messages[i].username}`);
                 p.innerHTML = `${messages[i].message}\tFrom: ${messages[i].username}`;
                 p.setAttribute('class', 'user_displayed_message');
-                document.querySelector(".holy-grail-content").append(p);
+                p.setAttribute('id',document.querySelector('username'));
+                if(messages[i].username === username){
+                    document.querySelector('#user_side_messages').append(p);
+                }
+                else {
+                    document.querySelector('#foreign_side').append(p);
+                }
             }
         }
     };
@@ -278,12 +292,19 @@ function message(socket,button = null,pre_channel = null) {
             let messages = data.messages;
             console.log(messages);
             let length = messages.length;
+            let username = localStorage.getItem('username');
             for (let i = 0; i < length; i++) {
                 let p = document.createElement('p');
                 console.log(`${messages[i].message} from ${messages[i].username}`);
                 p.innerHTML = `${messages[i].message}\tFrom: ${messages[i].username}`;
                 p.setAttribute('class', 'user_displayed_message');
-                document.querySelector(".holy-grail-content").append(p);
+                p.setAttribute('id',document.querySelector('username'));
+                if(messages[i].username === username){
+                    document.querySelector('#user_side_messages').append(p);
+                }
+                else {
+                    document.querySelector('#foreign_side').append(p);
+                }
             }
         }
     };

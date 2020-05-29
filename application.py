@@ -31,7 +31,8 @@ def user():
     if data in user_names_list:
         return jsonify({"success":False})
     else:
-        user_names_list.append(user_names_list)
+        user_names_list.append(data)
+        print(user_names_list)
         return jsonify({"username":data,"success":True})
 
 @app.route("/channels",methods = ["POST","GET"])

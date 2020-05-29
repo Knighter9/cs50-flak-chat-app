@@ -1,3 +1,98 @@
+/* Set up the Login form */
+.form{
+
+    margin:20px auto;
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap ;
+    width: 60%;
+    justify-content: center;
+    background-color: red;
+}
+/* give padding and margin for all of the input tags */
+input{
+    padding: 2px;
+    margin: 2px;
+}
+/* make the first input field on the form take up 100% of the width of the container div*/
+.form > input:first-child{
+    flex: 100%;
+}
+/* mak the form submit button 60px */
+#submit{
+
+    width: 60px;
+}
+
+/* style and create the layout for the main page */
+/* make the header take up 100% of the screen top welcome */
+header{
+    width: 100%;
+    text-align: center;
+    background-color: lightpink;
+}
+/* create the main content area where the chat messages will be displayed*/
+/* enable flex on the holy-grail-body */
+.holy-grail-body{
+    display: flex;
+    background-color: lightcyan;
+    flex-direction: row;
+    justify-content: space-between;
+}
+/* side bars */
+.hg-sidebar{
+    flex:1 2 100px;
+    background-color: green;
+    border: 2px solid black;
+
+}
+/* main content */
+.holy-grail-content{
+    flex:2 1 400px;
+    background-color: lightblue;
+    display:flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+/* make sure the title of the chat is taking up the whole width */
+#welcome_chat{
+    width: 100%;
+    background-color: orange;
+}
+/* splitting the holy-grail-content area in half with two divs for messages */
+#user_side {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    background-color: lightgray;
+    border: solid 2px blue;
+}
+
+#foreign_side{
+    flex:1;
+    border: solid black 2px;
+
+}
+/* make sure the user messages has a minimum height of 100px */
+#user_side_messages{
+    border: solid 2px black;
+    min-height: 200px;
+    flex: 1;
+}
+#user_side_input{
+    align-self: flex-end;
+}
+/* move the input for the message to the right side of the div */
+.message{
+    align-self: flex-end;
+}
+/* remove the dot styling from the li element */
+li{
+    list-style:none;
+    margin: 2px;
+    text-align: center;
+}
+/*
 .form{
     margin: 20px;
     padding: 20px;
@@ -36,13 +131,18 @@ input{
 
 }
 
+ */
+/*
 .holy-grail-content {
-    flex: 1 1 auto;
+    display: flex;
+    flex: 1 1 auto;.
     background:rgba(0,0,0,0.3);
+    justify-content: space-between;
     padding: 5px;
     margin: 5px;
 
-}
+
+
 
 .holy-grail-sidebar-1 {
     order: -1;
@@ -86,8 +186,32 @@ li{
 
 
 }
-/*
-.submit_message{
-    visibility: hidden;
+#user_side{
+    flex: 1;
+   background-color: red;
+
+
 }
-8?
+#foreign_side{
+    flex: 1;
+    background-color:  lightblue;
+  }
+#welcome-chat{
+    width: 100%;
+    background-color: orange;
+}
+*/
+/*
+.col-1 {width: 8.33%;}
+.col-2 {width: 16.66%;}
+.col-3 {width: 25%;}
+.col-4 {width: 33.33%;}
+.col-5 {width: 41.66%;}
+.col-6 {width: 50%;}
+.col-7 {width: 58.33%;}
+.col-8 {width: 66.66%;}
+.col-9 {width: 75%;}
+.col-10 {width: 83.33%;}
+.col-11 {width: 91.66%;}
+.col-12 {width: 100%;}
+/*
